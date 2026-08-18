@@ -1,10 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-namespace WPZ0325.EasyTableUGUI
+namespace WPZ0325.EasyTable
 {
     public class TableController : MonoBehaviour
     {

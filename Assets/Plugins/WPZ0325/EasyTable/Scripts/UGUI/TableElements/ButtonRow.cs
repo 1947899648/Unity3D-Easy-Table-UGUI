@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-namespace WPZ0325.EasyTableUGUI
+namespace WPZ0325.EasyTable
 {
     public class ButtonRow : MonoBehaviour
     {

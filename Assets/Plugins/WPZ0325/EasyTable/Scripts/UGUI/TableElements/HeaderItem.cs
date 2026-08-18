@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace WPZ0325.EasyTableUGUI
+namespace WPZ0325.EasyTable
 {
     public class HeaderItem : MonoBehaviour
     {

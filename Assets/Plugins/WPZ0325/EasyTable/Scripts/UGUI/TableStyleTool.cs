@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace WPZ0325.EasyTableUGUI
+namespace WPZ0325.EasyTable
 {
     /// <summary>
     /// 分“类型+尺寸+颜色”控制

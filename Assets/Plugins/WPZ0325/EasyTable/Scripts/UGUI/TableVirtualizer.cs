@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-namespace WPZ0325.EasyTableUGUI
+namespace WPZ0325.EasyTable
 {
     /// <summary>
     /// 表格行循环虚拟化器（快照式）：只实例化覆盖视口+缓冲数量的行，
