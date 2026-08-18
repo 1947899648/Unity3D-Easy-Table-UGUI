@@ -33,6 +33,26 @@ namespace WPZ0325.EasyTableUGUI
 
         TableVirtualizer m_Virtualizer;
 
+        /// <summary>
+        /// 数据行数
+        /// </summary>
+        public int RowCount => m_TableData.Count;
+
+        /// <summary>
+        /// 数据列数
+        /// </summary>
+        public int ColumnCount => m_TableHeader.Count;
+
+        /// <summary>
+        /// Toggle行勾选变化事件
+        /// </summary>
+        public event Action<int, bool> ToggleChanged;
+
+        /// <summary>
+        /// Button行点击事件
+        /// </summary>
+        public event Action<int> ButtonClicked;
+
         private void Awake()
         {
             m_Virtualizer = new TableVirtualizer(
@@ -131,6 +151,10 @@ namespace WPZ0325.EasyTableUGUI
         void OnToggleChanged(int rowIndex, bool value)
         {
             print($"Toggle:{value},{rowIndex},{m_TableData[rowIndex]}");
+            if (ToggleChanged != null)
+            {
+                ToggleChanged(rowIndex, value);
+            }
         }
 
         /// <summary>
@@ -139,6 +163,10 @@ namespace WPZ0325.EasyTableUGUI
         void OnButtonClicked(int rowIndex)
         {
             print($"Button:{rowIndex},{m_TableData[rowIndex]}");
+            if (ButtonClicked != null)
+            {
+                ButtonClicked(rowIndex);
+            }
         }
 
         /// <summary>
