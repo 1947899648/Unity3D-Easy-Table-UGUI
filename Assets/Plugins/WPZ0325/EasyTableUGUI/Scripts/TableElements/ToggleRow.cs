@@ -13,12 +13,12 @@ namespace WPZ0325.EasyTableUGUI
         public void SetToggleRow(int index,bool value,UnityAction<bool> action = null)
         {
             m_RowIndex = index;
-            m_Toggle.isOn = value;
+            m_Toggle.onValueChanged.RemoveAllListeners();
             if (!System.Object.ReferenceEquals(action,null))
             {
-                m_Toggle.onValueChanged.RemoveAllListeners();
                 m_Toggle.onValueChanged.AddListener(action);
             }
+            m_Toggle.isOn = value;
         }
         public int GetRowIndex() => m_RowIndex;
     }

@@ -13,8 +13,6 @@ namespace WPZ0325.EasyTableUGUI
         /// </summary>
         List<string> m_TableHeader = new List<string>();
         List<List<string>> m_TableData = new List<List<string>>();
-        List<ToggleRow> m_ToggleRows = new List<ToggleRow>();
-        List<ButtonRow> m_ButtonRows = new List<ButtonRow>();
 
         [Header("-----------------Table Key Element----------------------------------")]
         [SerializeField] ScrollRect m_ToggleRowsHolder;
@@ -33,14 +31,25 @@ namespace WPZ0325.EasyTableUGUI
         [Header("-----------------Table Style Tool----------------------------------")]
         [SerializeField] TableStyleTool m_TableStyleTool;
 
+        TableVirtualizer m_Virtualizer;
+
         private void Awake()
         {
+            m_Virtualizer = new TableVirtualizer(
+                m_ToggleRow, m_ButtonRow, m_ContentRow, m_ContentItem,
+                m_ToggleRowsHolder, m_ButtonRowsHolder, m_ContentRowsHolder,
+                m_TableStyleTool,
+                OnToggleChanged, OnButtonClicked);
             CleanTable();
         }
 
         private void Update()
         {
             TableScrollRectSync();
+            if (m_Virtualizer != null)
+            {
+                m_Virtualizer.OnUpdate();
+            }
         }
 
         /// <summary>
@@ -50,12 +59,11 @@ namespace WPZ0325.EasyTableUGUI
         {
             m_TableHeader.Clear();
             m_TableData.Clear();
-            m_ToggleRows.Clear();
-            m_ButtonRows.Clear();
-            RemoveAllChildren(m_ToggleRowsHolder.content);
-            RemoveAllChildren(m_ButtonRowsHolder.content);
+            if (m_Virtualizer != null)
+            {
+                m_Virtualizer.ClearAll();
+            }
             RemoveAllChildren(m_HeaderRowsHolder);
-            RemoveAllChildren(m_ContentRowsHolder.content);
         }
 
         /// <summary>
@@ -93,44 +101,10 @@ namespace WPZ0325.EasyTableUGUI
 
         
         /// <summary>
-        /// 加载原始数据至表格并呈现
+        /// 加载原始数据至表格并呈现（行内容走虚拟化，仅实例化可视窗口+缓冲的行）
         /// </summary>
         private void LoadRawDataToTable()
         {
-            //Update Toggle Area
-            if (m_TableStyleTool.IsShowToggleColumn)
-            {
-                for (int i = 0; i < m_TableData.Count; i++)
-                {
-                    ToggleRow newToggle = Instantiate(m_ToggleRow);
-                    newToggle.transform.SetParent(m_ToggleRowsHolder.content);
-                    newToggle.GetComponent<RectTransform>().localScale = Vector3.one;
-                    //Set Toggle Value and Event....
-                    newToggle.SetToggleRow(i,false,(bool b)=> 
-                    {
-                        print($"Toggle:{b},{newToggle.GetRowIndex()},{m_TableData[newToggle.GetRowIndex()]}");
-                    });;
-                    m_ToggleRows.Add(newToggle);
-                }
-            }
-
-            //Update Button Area
-            if (m_TableStyleTool.IsShowButtonColumn)
-            {
-                for (int i = 0; i < m_TableData.Count; i++)
-                {
-                    ButtonRow newButton = Instantiate(m_ButtonRow);
-                    newButton.transform.SetParent(m_ButtonRowsHolder.content);
-                    newButton.GetComponent<RectTransform>().localScale = Vector3.one;
-                    //Set Button Value and Event....
-                    newButton.SetButtonRow(i,"Click me", ()=> 
-                    {
-                        print($"Button:{newButton.GetRowIndex()},{m_TableData[newButton.GetRowIndex()]}");
-                    });
-                    m_ButtonRows.Add(newButton);
-                }
-            }
-
             //Update Header Area
             for (int i = 0; i < m_TableHeader.Count; i++)
             {
@@ -141,24 +115,30 @@ namespace WPZ0325.EasyTableUGUI
                 newHeaderItem.SetHeaderItem(m_TableHeader[i]);
             }
 
-            //Update Content Area
-            for (int i = 0; i < m_TableData.Count; i++)
+            //Update Toggle/Button/Content Area (Virtualized)
+            if (m_Virtualizer != null)
             {
-                RectTransform newContentRow = GameObject.Instantiate(m_ContentRow);
-                newContentRow.SetParent(m_ContentRowsHolder.content);
-                newContentRow.GetComponent<RectTransform>().localScale = Vector3.one;
-                for (int j = 0; j < m_TableHeader.Count; j++)
-                {
-                    ContentItem newContentItem = Instantiate(m_ContentItem);
-                    newContentItem.transform.SetParent(newContentRow);
-                    newContentItem.GetComponent<RectTransform>().localScale = Vector3.one;
-                    //Set ContentItem Value and Width
-                    newContentItem.SetContentItem(m_TableData[i][j]);
-                }
+                m_Virtualizer.SetData(m_TableData, m_TableHeader.Count);
             }
             m_TableStyleTool.SetTableType();
             m_TableStyleTool.SetTableSize();
             m_TableStyleTool.SetTableColor();
+        }
+
+        /// <summary>
+        /// Toggle行点击回调
+        /// </summary>
+        void OnToggleChanged(int rowIndex, bool value)
+        {
+            print($"Toggle:{value},{rowIndex},{m_TableData[rowIndex]}");
+        }
+
+        /// <summary>
+        /// Button行点击回调
+        /// </summary>
+        void OnButtonClicked(int rowIndex)
+        {
+            print($"Button:{rowIndex},{m_TableData[rowIndex]}");
         }
 
         /// <summary>
@@ -192,4 +172,3 @@ namespace WPZ0325.EasyTableUGUI
         }
     }
 }
-

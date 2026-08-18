@@ -15,9 +15,9 @@ namespace WPZ0325.EasyTableUGUI
         {
             m_RowIndex = index;
             m_ButtonText.text = buttonName;
+            m_Button.onClick.RemoveAllListeners();
             if (!System.Object.ReferenceEquals(action, null))
             {
-                m_Button.onClick.RemoveAllListeners();
                 m_Button.onClick.AddListener(action);
             }
         }

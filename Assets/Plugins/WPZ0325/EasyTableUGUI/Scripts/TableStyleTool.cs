@@ -19,13 +19,13 @@ namespace WPZ0325.EasyTableUGUI
 
         [Header("----------------------TableSize-----------------------------------------------")]
         [Tooltip("Toggle列宽度")][Range(0,150.0f)]
-        [SerializeField] float ToggleColumnWidth = 100.0f;
+        public float ToggleColumnWidth = 100.0f;
         [Tooltip("Button列宽度")][Range(0,150.0f)]
-        [SerializeField] float ButtonColumnWitdh = 150.0f;
+        public float ButtonColumnWitdh = 150.0f;
         [Tooltip("表格头Header高度")][Range(0, 100.0f)]
         [SerializeField] float HeaderHeight = 80.0f;
         [Tooltip("表格行Row高度")][Range(0,100.0f)]
-        [SerializeField] float ContentRowHeight = 60.0f;
+        public float ContentRowHeight = 60.0f;
 
         [Header("----------------------TableColor-----------------------------------------------")]
         [Tooltip("Toggle列头部颜色")] [SerializeField] Color ToggleColumnHeaderColor = Color.white;
@@ -46,7 +46,6 @@ namespace WPZ0325.EasyTableUGUI
         [SerializeField] LayoutElement m_ToggleColumn;
         [SerializeField] LayoutElement m_ButtonColumn;
         [SerializeField] List<LayoutElement> m_Headers = new List<LayoutElement>();
-        [SerializeField] List<ScrollRect> m_RowsHolderArea = new List<ScrollRect>();
         [SerializeField] Image m_ToggleColumnHeaderImage;
         [SerializeField] Image m_ButtonColumnHeaderImage;
         [SerializeField] Image m_HeaderBackground;
@@ -85,35 +84,17 @@ namespace WPZ0325.EasyTableUGUI
                     item.minHeight = HeaderHeight;
                 }
             }
-            //表格行Row高度
-            foreach (ScrollRect area in m_RowsHolderArea)
-            {
-                for (int i = 0; i < area.content.childCount; i++)
-                {
-                    area.content.GetChild(i).GetComponent<LayoutElement>().minHeight = ContentRowHeight;
-                }
-            }
         }
 
         /// <summary>
-        /// 设置表格颜色方面
+        /// 设置表格颜色方面（行/单元格颜色由虚拟化生成行时按数据行号设置）
         /// </summary>
         public void SetTableColor()
         {
-            //Set Toggle Column
+            //Set Toggle Column Header
             m_ToggleColumnHeaderImage.color = ToggleColumnHeaderColor;
-            for (int i = 0; i < m_RowsHolderArea[0].content.transform.childCount; i++)
-            {
-                Image toggleRow = m_RowsHolderArea[0].content.transform.GetChild(i).GetComponent<Image>();
-                toggleRow.color = IsOdd(i) ? ToggleColumnOddRowColor : ToggleColumnEvenRowColor;
-            }
-            //Set Button Column
+            //Set Button Column Header
             m_ButtonColumnHeaderImage.color = ButtonColumnHeaderColor;
-            for (int i = 0; i < m_RowsHolderArea[1].content.transform.childCount; i++)
-            {
-                Image buttonRow = m_RowsHolderArea[1].content.transform.GetChild(i).GetComponent<Image>();
-                buttonRow.color = IsOdd(i) ? ButtonColumnOddRowColor : ButtonColumnEvenRowColor;
-            }
             //Set Header
             m_HeaderBackground.color = HeaderBackgroundColor;
             for (int i = 0; i < m_HeaderItemHolder.childCount; i++)
@@ -121,18 +102,20 @@ namespace WPZ0325.EasyTableUGUI
                 Image headerItem = m_HeaderItemHolder.GetChild(i).GetComponent<Image>();
                 headerItem.color = IsOdd(i) ? HeaderItemOddColumnColor : HeaderItemEvenColumnColor;
             }
-            //Set Content
-            for (int i = 0; i < m_RowsHolderArea[2].content.transform.childCount; i++)
-            {
-                Image contentRowImage = m_RowsHolderArea[2].content.transform.GetChild(i).GetComponent<Image>();
-                contentRowImage.color = IsOdd(i) ? ContentOddRowColor : ContentEvenRowColor;
-                for (int j = 0; j < m_RowsHolderArea[2].content.transform.GetChild(i).childCount; j++)
-                {
-                    Image contentItemImage = m_RowsHolderArea[2].content.transform.GetChild(i).GetChild(j).GetComponent<Image>();
-                    contentItemImage.color = IsOdd(j) ? ContentItemOddColumnColor : ContentItemEvenColumnColor;
-                }
-            }
         }
+
+        /// <summary>
+        /// 行虚拟化生成行时按行号获取颜色
+        /// </summary>
+        public Color GetToggleRowColor(int rowIndex) => IsOdd(rowIndex) ? ToggleColumnOddRowColor : ToggleColumnEvenRowColor;
+
+        public Color GetButtonRowColor(int rowIndex) => IsOdd(rowIndex) ? ButtonColumnOddRowColor : ButtonColumnEvenRowColor;
+
+        public Color GetHeaderItemColor(int columnIndex) => IsOdd(columnIndex) ? HeaderItemOddColumnColor : HeaderItemEvenColumnColor;
+
+        public Color GetContentRowColor(int rowIndex) => IsOdd(rowIndex) ? ContentOddRowColor : ContentEvenRowColor;
+
+        public Color GetContentItemColor(int columnIndex) => IsOdd(columnIndex) ? ContentItemOddColumnColor : ContentItemEvenColumnColor;
 
         /// <summary>
         /// 判断数字奇偶性
