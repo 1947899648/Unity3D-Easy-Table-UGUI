@@ -46,6 +46,7 @@ namespace WPZ0325.EasyTableUGUI
         [SerializeField] LayoutElement m_ToggleColumn;
         [SerializeField] LayoutElement m_ButtonColumn;
         [SerializeField] List<LayoutElement> m_Headers = new List<LayoutElement>();
+        [SerializeField] List<ScrollRect> m_RowsHolderArea = new List<ScrollRect>();
         [SerializeField] Image m_ToggleColumnHeaderImage;
         [SerializeField] Image m_ButtonColumnHeaderImage;
         [SerializeField] Image m_HeaderBackground;
@@ -84,10 +85,27 @@ namespace WPZ0325.EasyTableUGUI
                     item.minHeight = HeaderHeight;
                 }
             }
+#if UNITY_EDITOR
+            //编辑模式实时预览行高（运行时行高由虚拟化按ContentRowHeight生成，避免误改占位对象）
+            if (!Application.isPlaying)
+            {
+                foreach (ScrollRect area in m_RowsHolderArea)
+                {
+                    for (int i = 0; i < area.content.childCount; i++)
+                    {
+                        LayoutElement rowElement = area.content.GetChild(i).GetComponent<LayoutElement>();
+                        if (rowElement != null)
+                        {
+                            rowElement.minHeight = ContentRowHeight;
+                        }
+                    }
+                }
+            }
+#endif
         }
 
         /// <summary>
-        /// 设置表格颜色方面（行/单元格颜色由虚拟化生成行时按数据行号设置）
+        /// 设置表格颜色方面（运行时行/单元格颜色由虚拟化生成行时按数据行号设置；编辑模式遍历示例行实时预览）
         /// </summary>
         public void SetTableColor()
         {
@@ -102,6 +120,44 @@ namespace WPZ0325.EasyTableUGUI
                 Image headerItem = m_HeaderItemHolder.GetChild(i).GetComponent<Image>();
                 headerItem.color = IsOdd(i) ? HeaderItemOddColumnColor : HeaderItemEvenColumnColor;
             }
+#if UNITY_EDITOR
+            //编辑模式实时预览行/单元格颜色（运行时按数据行号着色，索引遍历会错位，故仅在编辑模式执行）
+            if (!Application.isPlaying)
+            {
+                for (int i = 0; i < m_RowsHolderArea[0].content.childCount; i++)
+                {
+                    Image toggleRow = m_RowsHolderArea[0].content.GetChild(i).GetComponent<Image>();
+                    if (toggleRow != null)
+                    {
+                        toggleRow.color = IsOdd(i) ? ToggleColumnOddRowColor : ToggleColumnEvenRowColor;
+                    }
+                }
+                for (int i = 0; i < m_RowsHolderArea[1].content.childCount; i++)
+                {
+                    Image buttonRow = m_RowsHolderArea[1].content.GetChild(i).GetComponent<Image>();
+                    if (buttonRow != null)
+                    {
+                        buttonRow.color = IsOdd(i) ? ButtonColumnOddRowColor : ButtonColumnEvenRowColor;
+                    }
+                }
+                for (int i = 0; i < m_RowsHolderArea[2].content.childCount; i++)
+                {
+                    Image contentRowImage = m_RowsHolderArea[2].content.GetChild(i).GetComponent<Image>();
+                    if (contentRowImage != null)
+                    {
+                        contentRowImage.color = IsOdd(i) ? ContentOddRowColor : ContentEvenRowColor;
+                    }
+                    for (int j = 0; j < m_RowsHolderArea[2].content.GetChild(i).childCount; j++)
+                    {
+                        Image contentItemImage = m_RowsHolderArea[2].content.GetChild(i).GetChild(j).GetComponent<Image>();
+                        if (contentItemImage != null)
+                        {
+                            contentItemImage.color = IsOdd(j) ? ContentItemOddColumnColor : ContentItemEvenColumnColor;
+                        }
+                    }
+                }
+            }
+#endif
         }
 
         /// <summary>

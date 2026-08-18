@@ -8360,6 +8360,10 @@ MonoBehaviour:
   - {fileID: 5277753150546532330}
   - {fileID: 5277753151256891113}
   - {fileID: 5277753150409868324}
+  m_RowsHolderArea:
+  - {fileID: 5277753150458915828}
+  - {fileID: 5277753151027020386}
+  - {fileID: 5277753152055230768}
   m_ToggleColumnHeaderImage: {fileID: 5277753150546532324}
   m_ButtonColumnHeaderImage: {fileID: 5277753151256891112}
   m_HeaderBackground: {fileID: 5277753150409868331}
