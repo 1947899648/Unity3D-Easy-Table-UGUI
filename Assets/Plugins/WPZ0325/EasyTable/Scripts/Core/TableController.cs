@@ -6,7 +6,7 @@ using System;
 
 namespace WPZ0325.EasyTable
 {
-    public class TMP_TableController : MonoBehaviour
+    public class TableController : MonoBehaviour
     {
         /// <summary>
         /// Table Raw Data
@@ -22,16 +22,16 @@ namespace WPZ0325.EasyTable
         [SerializeField] ScrollRect m_ContentRowsHolder;
 
         [Header("-----------------Table Prefabs----------------------------------")]
-        [SerializeField] TMP_ToggleRow m_ToggleRow;
-        [SerializeField] TMP_ButtonRow m_ButtonRow;
-        [SerializeField] TMP_HeaderItem m_HeaderItem;
+        [SerializeField] ToggleRow m_ToggleRow;
+        [SerializeField] ButtonRow m_ButtonRow;
+        [SerializeField] TextItemBase m_HeaderItem;
         [SerializeField] RectTransform m_ContentRow;
-        [SerializeField] TMP_ContentItem m_ContentItem;
+        [SerializeField] TextItemBase m_ContentItem;
 
         [Header("-----------------Table Style Tool----------------------------------")]
-        [SerializeField] TMP_TableStyleTool m_TableStyleTool;
+        [SerializeField] TableStyleTool m_TableStyleTool;
 
-        TMP_TableVirtualizer m_Virtualizer;
+        TableVirtualizer m_Virtualizer;
 
         /// <summary>
         /// 数据行数
@@ -55,7 +55,7 @@ namespace WPZ0325.EasyTable
 
         private void Awake()
         {
-            m_Virtualizer = new TMP_TableVirtualizer(
+            m_Virtualizer = new TableVirtualizer(
                 m_ToggleRow, m_ButtonRow, m_ContentRow, m_ContentItem,
                 m_ToggleRowsHolder, m_ButtonRowsHolder, m_ContentRowsHolder,
                 m_TableStyleTool,
@@ -128,11 +128,11 @@ namespace WPZ0325.EasyTable
             //Update Header Area
             for (int i = 0; i < m_TableHeader.Count; i++)
             {
-                TMP_HeaderItem newHeaderItem = Instantiate(m_HeaderItem);
+                TextItemBase newHeaderItem = Instantiate(m_HeaderItem);
                 newHeaderItem.transform.SetParent(m_HeaderRowsHolder);
                 newHeaderItem.GetComponent<RectTransform>().localScale = Vector3.one;
-                //Set TMP_HeaderItem Value and Width
-                newHeaderItem.SetHeaderItem(m_TableHeader[i]);
+                //Set Header Value
+                newHeaderItem.SetText(m_TableHeader[i]);
             }
 
             //Update Toggle/Button/Content Area (Virtualized)

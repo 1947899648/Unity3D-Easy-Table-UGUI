@@ -10,21 +10,21 @@ namespace WPZ0325.EasyTable
     /// 表格行循环虚拟化器（快照式）：只实例化覆盖视口+缓冲数量的行，
     /// content 高度写死为 总行数x行高，滚动时按快照整体重排行位置与数据
     /// </summary>
-    public class TMP_TableVirtualizer
+    public class TableVirtualizer
     {
         const int BUFFER_ROWS = 6;
         const float FALLBACK_VIEWPORT_HEIGHT = 600.0f;
 
-        readonly TMP_ToggleRow m_ToggleRowPrefab;
-        readonly TMP_ButtonRow m_ButtonRowPrefab;
+        readonly ToggleRow m_ToggleRowPrefab;
+        readonly ButtonRow m_ButtonRowPrefab;
         readonly RectTransform m_ContentRowPrefab;
-        readonly TMP_ContentItem m_ContentItemPrefab;
+        readonly TextItemBase m_ContentItemPrefab;
 
         readonly ScrollRect m_ToggleRowsHolder;
         readonly ScrollRect m_ButtonRowsHolder;
         readonly ScrollRect m_ContentRowsHolder;
 
-        readonly TMP_TableStyleTool m_StyleTool;
+        readonly TableStyleTool m_StyleTool;
         readonly Action<int, bool> m_OnToggleChanged;
         readonly Action<int> m_OnButtonClicked;
 
@@ -47,8 +47,8 @@ namespace WPZ0325.EasyTable
         readonly Color[] m_LastColors = new Color[8];
 
         ContentRowView[] m_ContentRows;
-        TMP_ToggleRow[] m_ToggleRows;
-        TMP_ButtonRow[] m_ButtonRows;
+        ToggleRow[] m_ToggleRows;
+        ButtonRow[] m_ButtonRows;
 
         readonly RectTransform m_ContentPlaceholder;
         readonly RectTransform m_TogglePlaceholder;
@@ -57,16 +57,16 @@ namespace WPZ0325.EasyTable
         sealed class ContentRowView
         {
             public RectTransform rect;
-            public TMP_ContentItem[] items;
+            public TextItemBase[] items;
         }
 
         /// <summary>
         /// 构造：持有依赖引用，禁用行容器的布局组件（行定位改由代码控制），清理示例行并创建占位对象
         /// </summary>
-        public TMP_TableVirtualizer(
-            TMP_ToggleRow toggleRowPrefab, TMP_ButtonRow buttonRowPrefab, RectTransform contentRowPrefab, TMP_ContentItem contentItemPrefab,
+        public TableVirtualizer(
+            ToggleRow toggleRowPrefab, ButtonRow buttonRowPrefab, RectTransform contentRowPrefab, TextItemBase contentItemPrefab,
             ScrollRect toggleRowsHolder, ScrollRect buttonRowsHolder, ScrollRect contentRowsHolder,
-            TMP_TableStyleTool styleTool,
+            TableStyleTool styleTool,
             Action<int, bool> onToggleChanged, Action<int> onButtonClicked)
         {
             m_ToggleRowPrefab = toggleRowPrefab;
@@ -203,15 +203,15 @@ namespace WPZ0325.EasyTable
                 PositionRow(row.rect, dataRow);
                 for (int j = 0; j < m_ColumnCount; j++)
                 {
-                    row.items[j].SetContentItem(valid && j < rowData.Count ? rowData[j] : "");
+                    row.items[j].SetText(valid && j < rowData.Count ? rowData[j] : "");
                 }
                 ApplyContentRowColor(row, dataRow);
 
                 if (showToggle && m_ToggleRows[k] != null)
                 {
-                    TMP_ToggleRow TMP_ToggleRow = m_ToggleRows[k];
-                    PositionRow(TMP_ToggleRow.GetComponent<RectTransform>(), dataRow);
-                    ApplyToggleRowColor(TMP_ToggleRow, dataRow);
+                    ToggleRow toggleRow = m_ToggleRows[k];
+                    PositionRow(toggleRow.GetComponent<RectTransform>(), dataRow);
+                    ApplyToggleRowColor(toggleRow, dataRow);
                     int captured = dataRow;
                     UnityAction<bool> toggleAction = null;
                     if (valid)
@@ -225,14 +225,14 @@ namespace WPZ0325.EasyTable
                             }
                         };
                     }
-                    TMP_ToggleRow.SetToggleRow(captured, valid && m_ToggleStates[captured], toggleAction);
+                    toggleRow.SetToggleRow(captured, valid && m_ToggleStates[captured], toggleAction);
                 }
 
                 if (showButton && m_ButtonRows[k] != null)
                 {
-                    TMP_ButtonRow TMP_ButtonRow = m_ButtonRows[k];
-                    PositionRow(TMP_ButtonRow.GetComponent<RectTransform>(), dataRow);
-                    ApplyButtonRowColor(TMP_ButtonRow, dataRow);
+                    ButtonRow buttonRow = m_ButtonRows[k];
+                    PositionRow(buttonRow.GetComponent<RectTransform>(), dataRow);
+                    ApplyButtonRowColor(buttonRow, dataRow);
                     int captured = dataRow;
                     UnityAction buttonAction = null;
                     if (valid)
@@ -245,7 +245,7 @@ namespace WPZ0325.EasyTable
                             }
                         };
                     }
-                    TMP_ButtonRow.SetButtonRow(captured, "Click me", buttonAction);
+                    buttonRow.SetButtonRow(captured, "Click me", buttonAction);
                 }
             }
         }
@@ -264,8 +264,8 @@ namespace WPZ0325.EasyTable
             DestroyAllRows();
 
             m_ContentRows = new ContentRowView[m_RowCapacity];
-            m_ToggleRows = new TMP_ToggleRow[m_RowCapacity];
-            m_ButtonRows = new TMP_ButtonRow[m_RowCapacity];
+            m_ToggleRows = new ToggleRow[m_RowCapacity];
+            m_ButtonRows = new ButtonRow[m_RowCapacity];
 
             for (int k = 0; k < m_RowCapacity; k++)
             {
@@ -273,10 +273,10 @@ namespace WPZ0325.EasyTable
                 RectTransform row = UnityEngine.Object.Instantiate(m_ContentRowPrefab, m_ContentRowsHolder.content);
                 row.localScale = Vector3.one;
                 view.rect = row;
-                view.items = new TMP_ContentItem[m_ColumnCount];
+                view.items = new TextItemBase[m_ColumnCount];
                 for (int j = 0; j < m_ColumnCount; j++)
                 {
-                    TMP_ContentItem item = UnityEngine.Object.Instantiate(m_ContentItemPrefab, row);
+                    TextItemBase item = UnityEngine.Object.Instantiate(m_ContentItemPrefab, row);
                     item.transform.localScale = Vector3.one;
                     view.items[j] = item;
                 }
@@ -284,16 +284,16 @@ namespace WPZ0325.EasyTable
 
                 if (m_ToggleEnabled)
                 {
-                    TMP_ToggleRow TMP_ToggleRow = UnityEngine.Object.Instantiate(m_ToggleRowPrefab, m_ToggleRowsHolder.content);
-                    TMP_ToggleRow.transform.localScale = Vector3.one;
-                    m_ToggleRows[k] = TMP_ToggleRow;
+                    ToggleRow toggleRow = UnityEngine.Object.Instantiate(m_ToggleRowPrefab, m_ToggleRowsHolder.content);
+                    toggleRow.transform.localScale = Vector3.one;
+                    m_ToggleRows[k] = toggleRow;
                 }
 
                 if (m_ButtonEnabled)
                 {
-                    TMP_ButtonRow TMP_ButtonRow = UnityEngine.Object.Instantiate(m_ButtonRowPrefab, m_ButtonRowsHolder.content);
-                    TMP_ButtonRow.transform.localScale = Vector3.one;
-                    m_ButtonRows[k] = TMP_ButtonRow;
+                    ButtonRow buttonRow = UnityEngine.Object.Instantiate(m_ButtonRowPrefab, m_ButtonRowsHolder.content);
+                    buttonRow.transform.localScale = Vector3.one;
+                    m_ButtonRows[k] = buttonRow;
                 }
             }
             m_CurrentFirst = -1;
@@ -362,7 +362,7 @@ namespace WPZ0325.EasyTable
             }
         }
 
-        void ApplyToggleRowColor(TMP_ToggleRow row, int dataRow)
+        void ApplyToggleRowColor(ToggleRow row, int dataRow)
         {
             Image image = row.GetComponent<Image>();
             if (image != null)
@@ -371,7 +371,7 @@ namespace WPZ0325.EasyTable
             }
         }
 
-        void ApplyButtonRowColor(TMP_ButtonRow row, int dataRow)
+        void ApplyButtonRowColor(ButtonRow row, int dataRow)
         {
             Image image = row.GetComponent<Image>();
             if (image != null)

@@ -12,7 +12,7 @@ namespace WPZ0325.EasyTable
         [SerializeField] KeyCode m_ClearTable;
         [SerializeField] KeyCode m_UpdateTable;
         [SerializeField] TableController m_UguiTableController;
-        [SerializeField] TMP_TableController m_TmpTableController;
+        [SerializeField] TableController m_TmpTableController;
         [SerializeField] TextMeshProUGUI m_UguiTableInformation;
         [SerializeField] TextMeshProUGUI m_TmpTableInformation;
 
