@@ -9543,7 +9543,7 @@ MonoBehaviour:
   m_ToggleRow: {fileID: 3309814986364900326, guid: 3b62a98ef18d48d2b7de8fc148f446bf, type: 3}
   m_ButtonRow: {fileID: 863286545952595694, guid: 53f5451d2c7f46759e9a8b2597ddf039, type: 3}
   m_HeaderItem: {fileID: 5582543016049636838, guid: 767bc353159e4d2f9ca10edf27793b72, type: 3}
-  m_ContentRow: {fileID: 4682813828987120724, guid: 4e53394bb0c97fe4d9b510f302f16c2b, type: 3}
+  m_ContentRow: {fileID: 4682813828987120724, guid: c67770c52ef145cda10d15733989a9dc, type: 3}
   m_ContentItem: {fileID: 6289794253664709905, guid: 8285cdb3e5ff49468e430fccb157a4d5, type: 3}
   m_TableStyleTool: {fileID: 5277753151549577273}
 --- !u!1 &5277753151563544649
@@ -12444,7 +12444,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 0
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 10
   m_Viewport: {fileID: 5277753150736627029}
   m_HorizontalScrollbar: {fileID: 5277753150241326774}
   m_VerticalScrollbar: {fileID: 5277753150813323323}
